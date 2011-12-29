@@ -65,6 +65,10 @@ module Fog
             'cloudformation.us-east-1.amazonaws.com'
           when 'us-west-1'
             'cloudformation.us-west-1.amazonaws.com'
+          when 'us-west-2'
+            'cloudformation.us-west-2.amazonaws.com'
+          when 'sa-east-1'
+            'cloudformation.sa-east-1.amazonaws.com'
           else
             raise ArgumentError, "Unknown region: #{options[:region].inspect}"
           end

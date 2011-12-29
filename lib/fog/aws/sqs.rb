@@ -5,7 +5,7 @@ module Fog
     class SQS < Fog::Service
 
       requires :aws_access_key_id, :aws_secret_access_key
-      recognizes :region, :host, :path, :port, :scheme, :persistent
+      recognizes :region, :host, :path, :port, :scheme, :persistent, :aws_session_token
 
       request_path 'fog/aws/requests/sqs'
       request :change_message_visibility
@@ -40,7 +40,7 @@ module Fog
 
           @region = options[:region] || 'us-east-1'
 
-          unless ['ap-northeast-1', 'ap-southeast-1', 'eu-west-1', 'us-east-1', 'us-west-1'].include?(@region)
+          unless ['ap-northeast-1', 'ap-southeast-1', 'eu-west-1', 'us-east-1', 'us-west-1', 'us-west-2'].include?(@region)
             raise ArgumentError, "Unknown region: #{@region.inspect}"
           end
         end
@@ -71,13 +71,14 @@ module Fog
         #
         # ==== Parameters
         # * options<~Hash> - config arguments for connection.  Defaults to {}.
-        #   * region<~String> - optional region to use, in ['eu-west-1', 'us-east-1', 'us-west-1', 'ap-southeast-1']
+        #   * region<~String> - optional region to use, in ['eu-west-1', 'us-east-1', 'us-west-1', 'us-west-2', 'ap-southeast-1']
         #
         # ==== Returns
         # * SQS object with connection to AWS.
         def initialize(options={})
           @aws_access_key_id      = options[:aws_access_key_id]
           @aws_secret_access_key  = options[:aws_secret_access_key]
+          @aws_session_token      = options[:aws_session_token]
           @connection_options     = options[:connection_options] || {}
           @hmac = Fog::HMAC.new('sha256', @aws_secret_access_key)
           options[:region] ||= 'us-east-1'
@@ -90,6 +91,10 @@ module Fog
             'queue.amazonaws.com'
           when 'us-west-1'
             'us-west-1.queue.amazonaws.com'
+          when 'us-west-2'
+            'us-west-2.queue.amazonaws.com'
+          when 'sa-east-1'
+            'sa-east-1.queue.amazonaws.com'
           else
             raise ArgumentError, "Unknown region: #{options[:region].inspect}"
           end
@@ -119,6 +124,7 @@ module Fog
             params,
             {
               :aws_access_key_id  => @aws_access_key_id,
+              :aws_session_token  => @aws_session_token,
               :hmac               => @hmac,
               :host               => @host,
               :path               => path || @path,

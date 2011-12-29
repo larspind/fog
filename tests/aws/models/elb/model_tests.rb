@@ -54,7 +54,7 @@ Shindo.tests('AWS::ELB | models', ['aws', 'elb']) do
       # Need to sleep here for IAM changes to propgate
       tests('with ListenerDescriptions') do
         @certificate = Fog::AWS[:iam].upload_server_certificate(AWS::IAM::SERVER_CERT_PUBLIC_KEY, AWS::IAM::SERVER_CERT_PRIVATE_KEY, @key_name).body['Certificate']
-        sleep(8) unless Fog.mocking?
+        sleep(10) unless Fog.mocking?
         listeners = [{
             'Listener' => {
               'LoadBalancerPort' => 2030, 'InstancePort' => 2030, 'Protocol' => 'HTTP'
@@ -242,6 +242,11 @@ Shindo.tests('AWS::ELB | models', ['aws', 'elb']) do
       tests('a malformed policy') do
         raises(ArgumentError) { elb.policies.create(:id => 'foo', :cookie_stickiness => 'invalid stickiness') }
       end
+    end
+
+    tests('setting a new ssl certificate id') do
+      elb.listeners.create(:instance_port => 443, :lb_port => 443, :protocol => 'HTTPS', :ssl_id => @certificate['Arn'])
+      elb.set_listener_ssl_certificate(443, @certificate['Arn'])
     end
 
     tests('destroy') do

@@ -197,8 +197,14 @@ module Fog
             's3-eu-west-1.amazonaws.com'
           when 'us-east-1'
             's3.amazonaws.com'
+          when 'sa-east-1'
+            's3-sa-east-1.amazonaws.com'
           when 'us-west-1'
             's3-us-west-1.amazonaws.com'
+          when 'us-west-2'
+            's3-us-west-2.amazonaws.com'
+          when 'sa-east-1'
+            's3-sa-east-1.amazonaws.com'
           else
             raise ArgumentError, "Unknown region: #{options[:region].inspect}"
           end
@@ -251,7 +257,11 @@ module Fog
           if @endpoint = options[:endpoint]
             endpoint = URI.parse(@endpoint)
             @host = endpoint.host
-            @path = endpoint.path
+            @path = if endpoint.path.empty?
+              '/'
+            else
+              endpoint.path
+            end
             @port = endpoint.port
             @scheme = endpoint.scheme
           else
@@ -265,8 +275,12 @@ module Fog
               's3-eu-west-1.amazonaws.com'
             when 'us-east-1'
               's3.amazonaws.com'
+            when 'sa-east-1'
+              's3-sa-east-1.amazonaws.com'
             when 'us-west-1'
               's3-us-west-1.amazonaws.com'
+            when 'us-west-2'
+              's3-us-west-2.amazonaws.com'
             else
               raise ArgumentError, "Unknown region: #{options[:region].inspect}"
             end
